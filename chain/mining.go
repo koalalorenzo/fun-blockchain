@@ -2,7 +2,20 @@ package chain
 
 import "math/rand"
 
-// Mine will try to find a valid random nonce.
+func miningThread(b *Block, difficulty float64) *Block {
+	for {
+		newNonce := rand.Uint32()
+		b.Nonce = newNonce
+
+		if b.IsHashValid(difficulty) {
+			break
+		}
+	}
+
+	return b
+}
+
+// Mine will try to find a valid random nonce
 func (b *Block) Mine(difficulty float64) *Block {
 	// Check if a valid nonce is already there
 	if b.IsHashValid(difficulty) {
@@ -14,11 +27,7 @@ func (b *Block) Mine(difficulty float64) *Block {
 		return b
 	}
 
-	// Until the block has a valid hash, generate a new nonce.
-	for !b.IsHashValid(difficulty) {
-		newNonce := rand.Uint32()
-		b.Nonce = newNonce
-	}
-
+	// Until the block has a valid hash, generate a new nonce
+	b = miningThread(b, difficulty)
 	return b
 }
