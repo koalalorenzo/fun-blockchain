@@ -48,7 +48,7 @@ func (b Block) IsContentValid() bool {
 // IsHashValid check if the hash is valid with a specific difficulty.
 // This method basically is defining when the algorythm has generated a valid
 // block, using a specific difficulty.
-// Alternatives of algorythms to validate it:
+// Alternatives of "algorythms" to validate it:
 // 1. Trasnsform the hash in a string and check if it cointains "koalalorenzo"
 // 2. Check if the hash contains by the answer to life universe and everything
 func (b Block) IsHashValid(difficulty float64) bool {
