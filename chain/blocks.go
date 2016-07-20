@@ -10,9 +10,9 @@ import (
 // Block structure
 type Block struct {
 	Time         time.Time
-	Data         [MaxBlockDataPerBlock]BlockData
 	Nonce        uint32
 	PreviousHash uint64 // TBD
+	Data         [MaxBlockDataPerBlock]BlockData
 }
 
 // Hash will return the hash of the entire block.
