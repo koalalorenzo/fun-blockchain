@@ -17,13 +17,9 @@ func (b *Block) Mine(difficulty float64) *Block {
 	// Until the block has a valid hash, generate a new nonce
 	// This is not using another method, nor a thread/goroutine, nor threads
 	// because this code is designed to have fun
-	for {
+	for !b.IsHashValid(difficulty) {
 		newNonce := rand.Uint32()
 		b.Nonce = newNonce
-
-		if b.IsHashValid(difficulty) {
-			break
-		}
 	}
 
 	return b
