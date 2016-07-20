@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/koalalorenzo/spacechain/chain"
+	"github.com/koalalorenzo/blockchain/chain"
 )
 
 func main() {
@@ -16,6 +16,9 @@ func main() {
 	block.Mine(chain.MinBlockDifficulty)
 	fmt.Println("Time to mine it:", time.Since(block.Time))
 	fmt.Println("Block's hash", block.Hash())
-	fmt.Println("Genesis block created", block)
+	fmt.Println("Block:", block)
+	fmt.Println("Genesis block created:")
+	fmt.Println(block.ToJSON())
 
+	// fmt.Println("Base64:", base64.StdEncoding.EncodeToString([]byte(block.ToMap())))
 }
