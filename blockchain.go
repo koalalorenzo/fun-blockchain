@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/koalalorenzo/spacechain/chain"
+	"github.com/koalalorenzo/blockchain/chain"
 )
 
 func main() {
