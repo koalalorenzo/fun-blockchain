@@ -1,7 +1,10 @@
 package chain
 
 import (
+	"encoding/hex"
 	"math"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
@@ -10,9 +13,9 @@ import (
 // Block structure
 type Block struct {
 	Time         time.Time
-	Nonce        uint32
-	PreviousHash uint64 // TBD
-	Data         [MaxBlockDataPerBlock]BlockData
+	Nonce        string
+	PreviousHash string
+	Data         []BlockData
 }
 
 // Hash will return the hash of the entire block.
@@ -31,7 +34,14 @@ func (b Block) Hash() uint64 {
 func (b Block) IsContentValid() bool {
 
 	// Check if the block contains a minimum of data required.
+	// if 0 then empty blocks are allowed.
 	if len(b.Data) < MinBlockDataPerBlock {
+		return false
+	}
+
+	// Check if the block has more elements than allowed
+	// if 0 is considered infinite
+	if MaxBlockDataPerBlock > 0 && len(b.Data) < MaxBlockDataPerBlock {
 		return false
 	}
 
@@ -61,4 +71,50 @@ func (b Block) IsHashValid(difficulty float64) bool {
 	}
 
 	return false
+}
+
+/*
+	Import / Export using other formats
+*/
+
+// ToHex returns the hexadecimal string of the Block
+func (b Block) ToHex() string {
+
+	var hexData []string
+	for _, nBlockData := range b.Data {
+		hexData = append(hexData, nBlockData.ToHex())
+	}
+
+	unixTime := b.Time.Unix()
+
+	sum := string(unixTime) + "," + b.Nonce + "," + b.PreviousHash
+	sum = sum + "," + strings.Join(hexData, ",")
+	return hex.EncodeToString([]byte(sum))
+}
+
+// BlockFromHex returns a new Block from a hex string
+func BlockFromHex(hexString string) Block {
+
+	blockHexs, _ := hex.DecodeString(hexString)
+	blockArray := strings.Split(string(blockHexs), ",")
+	newBlock := Block{}
+
+	unixTime, err := strconv.ParseInt(blockArray[0], 0, 64)
+	if err != nil {
+		panic(err)
+	}
+	newBlock.Time = time.Unix(unixTime, 0)
+
+	newBlock.Nonce = blockArray[1]
+
+	newBlock.PreviousHash = blockArray[2]
+
+	for _, dataHex := range blockArray[3:] {
+		dataBlock, _ := BlockDataFromHex(dataHex)
+		// ToDo what if error?
+		// ToDo Check if valid?
+		newBlock.Data = append(newBlock.Data, dataBlock)
+	}
+	// ToDo Check if valid?
+	return newBlock
 }

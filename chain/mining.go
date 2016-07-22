@@ -19,7 +19,7 @@ func (b *Block) Mine(difficulty float64) *Block {
 	// because this code is designed to have fun
 	for !b.IsHashValid(difficulty) {
 		newNonce := rand.Uint32()
-		b.Nonce = newNonce
+		b.Nonce = string(newNonce)
 	}
 
 	return b

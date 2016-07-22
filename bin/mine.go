@@ -9,7 +9,8 @@ import (
 
 func main() {
 	block := chain.Block{
-		Time: time.Now(),
+		Time:         time.Now(),
+		PreviousHash: "nope",
 	}
 	fmt.Println("Mining with difficulty", chain.MinBlockDifficulty)
 
@@ -18,7 +19,6 @@ func main() {
 	fmt.Println("Block's hash", block.Hash())
 	fmt.Println("Block:", block)
 	fmt.Println("Genesis block created:")
-	fmt.Println(block.ToJSON())
-
-	// fmt.Println("Base64:", base64.StdEncoding.EncodeToString([]byte(block.ToMap())))
+	fmt.Println(block.ToHex())
+	fmt.Println(chain.BlockFromHex(block.ToHex()))
 }
