@@ -50,7 +50,10 @@ func BlockDataFromHex(hexString string) (BlockData, error) {
 
 	newBlockData := BlockData{}
 
-	unixTime, _ := strconv.ParseInt(blockArray[0], 0, 64)
+	unixTime, err := strconv.ParseInt(blockArray[0], 0, 64)
+	if err != nil {
+		panic(err)
+	}
 	newBlockData.time = time.Unix(unixTime, 0)
 
 	valueBytes, _ := hex.DecodeString(blockArray[1])
