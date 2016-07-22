@@ -1,13 +1,11 @@
 package chain
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
-	"math"
-	"strconv"
+	"fmt"
 	"strings"
 	"time"
-
-	"github.com/mitchellh/hashstructure"
 )
 
 // Block structure
@@ -20,14 +18,15 @@ type Block struct {
 
 // Hash will return the hash of the entire block.
 // Note that this method has to generate an unique value for the current block
-func (b Block) Hash() uint64 {
-	newHash, err := hashstructure.Hash(b, nil)
+func (b Block) Hash() []byte {
+	hash := sha256.Sum256([]byte(b.ToHex()))
+	doubleHash := sha256.Sum256(hash[:])
+	return doubleHash[:]
+}
 
-	if err != nil {
-		panic(err)
-	}
-
-	return newHash
+// HashString returns the hash in string format
+func (b Block) HashString() string {
+	return hex.EncodeToString(b.Hash())
 }
 
 // IsContentValid Check if the Block's data is valid.
@@ -62,15 +61,8 @@ func (b Block) IsContentValid() bool {
 // 1. Trasnsform the hash in a string and check if it cointains "koalalorenzo"
 // 2. Check if the hash contains by the answer to life universe and everything
 func (b Block) IsHashValid(difficulty float64) bool {
-	hashNumber := float64(b.Hash())
-
-	remains := math.Mod(hashNumber, difficulty)
-
-	if remains == 0 {
-		return true
-	}
-
-	return false
+	// magicHash := b.HashString()
+	return true
 }
 
 /*
@@ -80,15 +72,21 @@ func (b Block) IsHashValid(difficulty float64) bool {
 // ToHex returns the hexadecimal string of the Block
 func (b Block) ToHex() string {
 
+	unixDate := b.Time.Format(time.UnixDate)
+	timeHex := hex.EncodeToString([]byte(unixDate))
+
 	var hexData []string
 	for _, nBlockData := range b.Data {
 		hexData = append(hexData, nBlockData.ToHex())
 	}
 
-	unixTime := b.Time.Unix()
+	sum := timeHex + "," + b.Nonce + "," + b.PreviousHash
 
-	sum := string(unixTime) + "," + b.Nonce + "," + b.PreviousHash
-	sum = sum + "," + strings.Join(hexData, ",")
+	if len(hexData) > 0 {
+		sum = sum + "," + strings.Join(hexData, ",")
+	}
+
+	fmt.Println("BlockSum", sum)
 	return hex.EncodeToString([]byte(sum))
 }
 
@@ -99,15 +97,24 @@ func BlockFromHex(hexString string) Block {
 	blockArray := strings.Split(string(blockHexs), ",")
 	newBlock := Block{}
 
-	unixTime, err := strconv.ParseInt(blockArray[0], 0, 64)
+	timeString, err := hex.DecodeString(blockArray[0])
 	if err != nil {
 		panic(err)
 	}
-	newBlock.Time = time.Unix(unixTime, 0)
+	timeValue, err := time.Parse(time.UnixDate, string(timeString))
+	if err != nil {
+		panic(err)
+	}
+	newBlock.Time = timeValue
 
 	newBlock.Nonce = blockArray[1]
 
 	newBlock.PreviousHash = blockArray[2]
+
+	// Check if data is avaliable
+	if len(blockArray) == 3 {
+		return newBlock
+	}
 
 	for _, dataHex := range blockArray[3:] {
 		dataBlock, _ := BlockDataFromHex(dataHex)

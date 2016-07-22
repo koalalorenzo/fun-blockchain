@@ -16,7 +16,7 @@ func main() {
 
 	block.Mine(chain.MinBlockDifficulty)
 	fmt.Println("Time to mine it:", time.Since(block.Time))
-	fmt.Println("Block's hash", block.Hash())
+	fmt.Println("Block's hash", block.HashString())
 	fmt.Println("Block:", block)
 	fmt.Println("Genesis block created:")
 	fmt.Println(block.ToHex())
