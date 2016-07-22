@@ -13,7 +13,7 @@ func TestBlockDataExportImportHex(t *testing.T) {
 	}
 
 	newHex := blockData.ToHex()
-	newBlock := BlockDataFromHex(newHex)
+	newBlock, _ := BlockDataFromHex(newHex)
 
 	if newBlock.time.Unix() != newBlock.time.Unix() {
 		t.Error("Time check failed")
