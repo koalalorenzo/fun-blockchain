@@ -1,8 +1,8 @@
 package chain
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -25,6 +25,18 @@ func (data BlockData) IsValid() bool {
 	return true
 }
 
+// Hash will return the hash of the entire block data.
+func (data BlockData) Hash() []byte {
+	hash := sha256.Sum256([]byte(data.ToHex()))
+	doubleHash := sha256.Sum256(hash[:])
+	return doubleHash[:]
+}
+
+// HashString returns the hash in string format
+func (data BlockData) HashString() string {
+	return hex.EncodeToString(data.Hash())
+}
+
 /*
 	Import / Export using other formats
 */
@@ -33,12 +45,14 @@ func (data BlockData) IsValid() bool {
 func (data BlockData) ToHex() string {
 
 	// Encoding strings, since they may have commas
-	unixTime := data.time.Unix()
+	unixDate := data.time.Format(time.UnixDate)
+	timeHex := hex.EncodeToString([]byte(unixDate))
+
 	value := hex.EncodeToString([]byte(data.value))
 	signature := hex.EncodeToString([]byte(data.signature))
 
 	// Dividing the hex values by comma
-	sum := string(unixTime) + "," + value + "," + signature
+	sum := timeHex + "," + value + "," + signature
 	return hex.EncodeToString([]byte(sum))
 }
 
@@ -50,11 +64,15 @@ func BlockDataFromHex(hexString string) (BlockData, error) {
 
 	newBlockData := BlockData{}
 
-	unixTime, err := strconv.ParseInt(blockArray[0], 0, 64)
+	timeString, err := hex.DecodeString(blockArray[0])
 	if err != nil {
 		panic(err)
 	}
-	newBlockData.time = time.Unix(unixTime, 0)
+	timeValue, err := time.Parse(time.UnixDate, string(timeString))
+	if err != nil {
+		panic(err)
+	}
+	newBlockData.time = timeValue
 
 	valueBytes, _ := hex.DecodeString(blockArray[1])
 	newBlockData.value = string(valueBytes)
