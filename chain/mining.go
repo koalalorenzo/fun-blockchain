@@ -3,7 +3,7 @@ package chain
 import "math/rand"
 
 // Mine will try to find a valid random nonce
-func (b *Block) Mine(difficulty float64) *Block {
+func (b *Block) Mine(difficulty int64) *Block {
 	// Check if a valid nonce is already there
 	if b.IsHashValid(difficulty) {
 		return b
@@ -18,8 +18,8 @@ func (b *Block) Mine(difficulty float64) *Block {
 	// This is not using another method, nor a thread/goroutine, nor threads
 	// because this code is designed to have fun
 	for !b.IsHashValid(difficulty) {
-		newNonce := rand.Uint32()
-		b.Nonce = string(newNonce)
+		newNonce := rand.Int63()
+		b.Nonce = newNonce
 	}
 
 	return b

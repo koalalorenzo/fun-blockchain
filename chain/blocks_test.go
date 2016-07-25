@@ -8,7 +8,7 @@ import (
 func TestBlockExportImportHex(t *testing.T) {
 	testBlock := Block{
 		Time:         time.Now(),
-		Nonce:        "2",
+		Nonce:        2,
 		PreviousHash: "3",
 	}
 
@@ -27,7 +27,7 @@ func TestBlockExportImportHex(t *testing.T) {
 		t.Error("Time check failed")
 	}
 
-	if newBlock.Nonce != "2" {
+	if newBlock.Nonce != 2 {
 		t.Error("Nonce check failed")
 	}
 

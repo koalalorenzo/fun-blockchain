@@ -3,7 +3,7 @@ package chain
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -11,7 +11,7 @@ import (
 // Block structure
 type Block struct {
 	Time         time.Time
-	Nonce        string
+	Nonce        int64
 	PreviousHash string
 	Data         []BlockData
 }
@@ -60,8 +60,16 @@ func (b Block) IsContentValid() bool {
 // Alternatives of "algorythms" to validate it:
 // 1. Trasnsform the hash in a string and check if it cointains "koalalorenzo"
 // 2. Check if the hash contains by the answer to life universe and everything
-func (b Block) IsHashValid(difficulty float64) bool {
+func (b Block) IsHashValid(difficulty int64) bool {
+	if difficulty <= MinBlockDifficulty {
+		difficulty = MinBlockDifficulty
+	}
+
+	if b.Nonce <= difficulty {
+		return false
+	}
 	// magicHash := b.HashString()
+
 	return true
 }
 
@@ -71,23 +79,21 @@ func (b Block) IsHashValid(difficulty float64) bool {
 
 // ToHex returns the hexadecimal string of the Block
 func (b Block) ToHex() string {
+	var sum []string
+	unixDate := b.Time.UnixNano()
+	timeString := strconv.FormatInt(unixDate, 10)
+	sum = append(sum, timeString)
+	nonceString := strconv.FormatInt(b.Nonce, 10)
+	sum = append(sum, nonceString)
+	sum = append(sum, b.PreviousHash)
 
-	unixDate := b.Time.Format(time.UnixDate)
-	timeHex := hex.EncodeToString([]byte(unixDate))
-
-	var hexData []string
-	for _, nBlockData := range b.Data {
-		hexData = append(hexData, nBlockData.ToHex())
+	if len(b.Data) > 0 {
+		for _, nBlockData := range b.Data {
+			sum = append(sum, nBlockData.ToHex())
+		}
 	}
-
-	sum := timeHex + "," + b.Nonce + "," + b.PreviousHash
-
-	if len(hexData) > 0 {
-		sum = sum + "," + strings.Join(hexData, ",")
-	}
-
-	fmt.Println("BlockSum", sum)
-	return hex.EncodeToString([]byte(sum))
+	stringSum := strings.Join(sum, ",")
+	return hex.EncodeToString([]byte(stringSum))
 }
 
 // BlockFromHex returns a new Block from a hex string
@@ -97,17 +103,17 @@ func BlockFromHex(hexString string) Block {
 	blockArray := strings.Split(string(blockHexs), ",")
 	newBlock := Block{}
 
-	timeString, err := hex.DecodeString(blockArray[0])
+	timeInt, err := strconv.ParseInt(blockArray[0], 10, 64)
 	if err != nil {
 		panic(err)
 	}
-	timeValue, err := time.Parse(time.UnixDate, string(timeString))
-	if err != nil {
-		panic(err)
-	}
-	newBlock.Time = timeValue
+	newBlock.Time = time.Unix(0, timeInt)
 
-	newBlock.Nonce = blockArray[1]
+	nonceInt, err := strconv.ParseInt(blockArray[1], 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	newBlock.Nonce = nonceInt
 
 	newBlock.PreviousHash = blockArray[2]
 
