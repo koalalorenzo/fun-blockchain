@@ -23,7 +23,7 @@ func main() {
 	fmt.Println("Block created:")
 	fmt.Println(block.ToHex())
 
-	time.Sleep(60)
+	time.Sleep(60 * time.Second)
 
 	secondData := chain.NewBlockData("This is the second block")
 	secondBlock := chain.Block{
@@ -34,8 +34,8 @@ func main() {
 
 	secondBlock.Mine(chain.MinBlockDifficulty)
 	fmt.Println("Time to mine 2 block:", time.Since(secondBlock.Time))
-	fmt.Println("2 Block's hash", block.HashString())
-	fmt.Println("2 Block:", block)
+	fmt.Println("2 Block's hash", secondBlock.HashString())
+	fmt.Println("2 Block:", secondBlock)
 	fmt.Println("2 Block created:")
-	fmt.Println(block.ToHex())
+	fmt.Println(secondBlock.ToHex())
 }
