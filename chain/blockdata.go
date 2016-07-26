@@ -1,6 +1,7 @@
 package chain
 
 import (
+	"crypto"
 	"crypto/sha256"
 	"encoding/hex"
 	"strings"
@@ -38,21 +39,40 @@ func (data BlockData) HashString() string {
 }
 
 /*
+	Cryptography
+*/
+
+// Sign will cryptographically sign the BlockData content (Hash of Value and Time)
+func (data BlockData) Sign(privKey crypto.PrivateKey) {
+	// ToDO
+}
+
+// IsSignatureValid will validate the signature of the block data
+func (data BlockData) IsSignatureValid() bool {
+	return false
+}
+
+/*
 	Import / Export using other formats
 */
 
 // ToHex returns the string hex of the BlockData values
 func (data BlockData) ToHex() string {
+	var sumArray []string
 
 	// Encoding strings, since they may have commas
 	unixDate := data.time.Format(time.UnixDate)
 	timeHex := hex.EncodeToString([]byte(unixDate))
+	sumArray = append(sumArray, timeHex)
 
 	value := hex.EncodeToString([]byte(data.value))
+	sumArray = append(sumArray, value)
+
 	signature := hex.EncodeToString([]byte(data.signature))
+	sumArray = append(sumArray, signature)
 
 	// Dividing the hex values by comma
-	sum := timeHex + "," + value + "," + signature
+	sum := strings.Join(sumArray, ",")
 	return hex.EncodeToString([]byte(sum))
 }
 
@@ -84,4 +104,13 @@ func BlockDataFromHex(hexString string) (BlockData, error) {
 		panic("No valid block") // return error?
 	}
 	return newBlockData, nil
+}
+
+// NewBlockData generates a new block data with a valid value
+func NewBlockData(value string) BlockData {
+	newBlockData := BlockData{
+		time:  time.Now(),
+		value: value,
+	}
+	return newBlockData
 }
