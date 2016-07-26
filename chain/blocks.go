@@ -40,7 +40,7 @@ func (b Block) IsContentValid() bool {
 
 	// Check if the block has more elements than allowed
 	// if 0 is considered infinite
-	if MaxBlockDataPerBlock > 0 && len(b.Data) < MaxBlockDataPerBlock {
+	if MaxBlockDataPerBlock > 0 && len(b.Data) > MaxBlockDataPerBlock {
 		return false
 	}
 
