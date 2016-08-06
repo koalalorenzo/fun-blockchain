@@ -11,3 +11,6 @@ explore new way to replace the
 
 This project is not optimized or ready for production, since its purpose is not
 to provide a stable solution. No paper required. Just fun.
+
+This project is not implementing networking side, discovery and latency, 
+instead it will use IPFS to storage and distribution.
