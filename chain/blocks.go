@@ -65,10 +65,16 @@ func (b Block) IsHashValid(difficulty int64) bool {
 		difficulty = MinBlockDifficulty
 	}
 
-	if b.Nonce <= difficulty {
+	magicHash := b.Hash()
+	if int64(len(magicHash)) < difficulty {
 		return false
 	}
-	// magicHash := b.HashString()
+	// Checking if the bytes are 0 in the hash bytes
+	for i := 0; i <= int(difficulty); i++ {
+		if magicHash[i] != 0x0 {
+			return false
+		}
+	}
 
 	return true
 }

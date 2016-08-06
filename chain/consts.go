@@ -4,7 +4,7 @@ package chain
 
 // MinBlockDifficulty defines a constant to consider a block valid.
 // Check the Block.IsHashValid method
-const MinBlockDifficulty = 1e+08
+const MinBlockDifficulty = 2
 
 // MinBlockDataPerBlock defines the minimum data in a block.
 // 0 = unused/empty blocks considered valid.
